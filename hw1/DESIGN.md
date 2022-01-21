@@ -40,7 +40,7 @@ the next player's turn begins.
 - If the rolled pig lands on one of its two sides, then the player's turn ends and the next player gets to begin rolling.
 
 ## Pseudocode
-
+```
 player_num = input("How many players?")
 if player_num < 2 or player_num > 10 or player_num is not int:
         print("Invalid number of players. Using 2 instead.\n")
@@ -79,4 +79,4 @@ for i in player_num: int roll = 0
                 if (player_points[i] >= 100):
                         print(names[i], "wins with", player_points[i], "points!")
                         return 0
-
+```
