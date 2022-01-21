@@ -10,7 +10,8 @@ Implement a version of the game Pass the Pigs using the following rules:
 - trotter (1/7)
 - snouter (1/7)
 - jowler (2/7)
-###Each possible roll has a different point value:
+
+## Each possible roll has a different point value:
 - side = 0 pts
 - razorback/trotter = 10 pts
 - snouter = 15 pts
@@ -21,7 +22,7 @@ Implement a version of the game Pass the Pigs using the following rules:
 ## User Input
 
 - Ask user for number of players
-- If the user input is now between 2 and 10 inclusive, print an error message and use default value of 2. El,se, the number of players isequal to the user input.
+- If the user input is now between 2 and 10 inclusive, print an error message and use default value of 2. Else, the number of players is equal to the user input.
 - Prompt user to input random seed
 - if the user inputs anything other than a valid seed, print error message
 - valid seeds are from 0 to UINT_MAX inclusive
@@ -47,12 +48,12 @@ if player_num < 2 or player_num > 10 or player_num is not int:
         player_num = 2
 
 seed_num = input("Random seed:")
-if seed_num < 0 or seed_num > 4294967295 or seednum is not int: // UINT_MAX
+if seed_num < 0 or seed_num > 4294967295 or seednum is not int: // UINT_MAX value
         print("Invalid random seed. Using 2021 instead.\n")
         seed_num = 2022
 
 random.seed(seed_num)
-player_points = [0] * player_num])
+player_points = [0] * player_num
 
 for i in player_num: int roll = 0
         while player_points[i] < 100:
@@ -61,9 +62,9 @@ for i in player_num: int roll = 0
                 if roll == 1 or roll == 2: // Side
                         print("pig lands on side")
                         if i == player_num-1:
-                                i=0
+                            i=0
                         else:
-                        i += 1
+                            i += 1
                 if roll == 3: // Razorback
                         print("pig lands on back")
                         player_points[i] += 1
