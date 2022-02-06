@@ -23,7 +23,6 @@ bool stack_push(Stack *s, CalculatorItem item) {
   newtop->item = item;
   newtop->next = s->top;
   s->top = newtop;
-  //free(newtop);
   return true;
 }
 
@@ -35,7 +34,6 @@ bool stack_pop(Stack *s, CalculatorItem *output) {
     return false;
   }
 
-
   float result = s->top->item.value;
   output->value = result;
 
@@ -44,14 +42,13 @@ bool stack_pop(Stack *s, CalculatorItem *output) {
 
   free(delete_this);
 
-
   return true;
 }
 
 // Returns true if the specified stack is empty.
 bool stack_empty(Stack *s) {
   // your code here
-    if (s == NULL || s->top == NULL) {
+  if (s == NULL || s->top == NULL) {
     return true;
   }
   return false;
@@ -63,15 +60,10 @@ void stack_delete(Stack **s) {
   // your code here
   Node *child = (*s)->top;
   while (child != NULL) {
-      free(&child);
+    free(&child);
   }
   free(*s);
   s = NULL;
- // if (*s && (*s)->top->item) {
- //     free ((*s)->top->item);
- //     free (*s);
- //     *s = NULL;
- // }
   return;
 }
 
@@ -83,60 +75,55 @@ bool stack_compute_step(Stack *s, CalculatorItem item) {
   CalculatorItem y;
   CalculatorItem z;
   CalculatorItem result;
-  bool success;
-  int values = 0;
   if (item.type == NUMBER) {
-      stack_push(s, item);
+    stack_push(s, item);
   }
   if (item.type == ADD) {
-      stack_pop(s, &z);
-          x.value = z.value;
-          stack_pop(s, &z);
-              y.value = z.value;
-              result.value = x.value + y.value;
-      //stack_pop(s, &z);
-      //x.value = z.value;
-
-      //stack_pop(s, &z);
-      //y.value = z.value;
-      //result.value = x.value + y.value;
-
-      //}
-      stack_push(s, result);
+    stack_pop(s, &z);
+    x.value = z.value;
+    if (s->top == NULL) {
+      return false;
+    }
+    stack_pop(s, &z);
+    y.value = z.value;
+    result.value = x.value + y.value;
+    stack_push(s, result);
   }
   if (item.type == SUBTRACT) {
-      stack_pop(s, &z);
-      x.value = z.value;
-      stack_pop(s, &z);
-      y.value = z.value;
-      result.value = y.value - x.value;
-      //if (y.type != NUMBER) {
-      //    return false;
-     // }
-      stack_push(s, result);
+    stack_pop(s, &z);
+    x.value = z.value;
+    if (s->top == NULL) {
+      return false;
+    }
+    stack_pop(s, &z);
+    y.value = z.value;
+    result.value = y.value - x.value;
+    stack_push(s, result);
   }
   if (item.type == MULTIPLY) {
-      stack_pop(s, &z);
-      x.value = z.value;
-      stack_pop(s, &z);
-      y.value = z.value;
-      result.value = x.value * y.value;
-      //if (y.type != NUMBER) {
-      //    return false;
-      //}
-      stack_push(s, result);
+    stack_pop(s, &z);
+    x.value = z.value;
+    if (s->top == NULL) {
+      return false;
+    }
+    stack_pop(s, &z);
+    y.value = z.value;
+    result.value = x.value * y.value;
+    stack_push(s, result);
   }
   if (item.type == DIVIDE) {
-      stack_pop(s, &z);
-      x.value = z.value;
-      stack_pop(s, &z);
-      y.value = z.value;
-      result.value = y.value / x.value;
-      if (x.value == 0 || y.type != NUMBER)
-      //{
-      //    return false;
-      //}
-      stack_push(s, result);
+    stack_pop(s, &z);
+    x.value = z.value;
+    if (s->top == NULL) {
+      return false;
+    }
+    if (x.value == 0) {
+      return false;
+    }
+    stack_pop(s, &z);
+    y.value = z.value;
+    result.value = y.value / x.value;
+    stack_push(s, result);
   }
   return true;
 }

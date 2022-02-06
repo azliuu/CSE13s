@@ -9,14 +9,14 @@
 
 int main(void) {
   char buf[BUFSIZE];
-  FILE* infile;
-  infile=fopen("input.txt", "r");
+  FILE *infile;
+  infile = fopen("input.txt", "r");
   bool success;
   int linenum = 1;
 
-  Stack* calc_stack = stack_create();
+  Stack *calc_stack = stack_create();
   // Read the inputs from the input file and compute one step at a time!
-  while((fgets(buf, BUFSIZE, infile) != NULL)) {
+  while ((fgets(buf, BUFSIZE, infile) != NULL)) {
     CalculatorItem item;
 
     if (strncmp(buf, "+", 1) == 0) {
