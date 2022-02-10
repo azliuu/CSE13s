@@ -151,7 +151,16 @@ users* are available at that time.
 
 YOUR PLAN & EXPLANATION HERE (code goes in midterm.c)
 ```
+create a loop variable that represents the bit being tested
+while the testing bit is smaller than the size of an unsigned long
+        for every user
+                if the calendar of the user is 1 at the current testing bit
+                        set the corresponding bit in availability to 1, otherwise set to 0
+        outside if
+        increment testing bit
+        set calendars bit to shift right
 
+return the final availability unsigned long
 ```
 ## problem 5 (short answer)
 

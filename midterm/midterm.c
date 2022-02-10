@@ -9,22 +9,24 @@ long long *fibonacci_numbers(int n) {
   // You're going to have to allocate an array, fill it in, and return it.
   // The array should be of length n.
   // Recall the first few entries should be 1, 1, 2, 3, 5, 8, ...
-  // Based on the fibbonaci_recursive file in the given class examples repository.
+  // Based on the fibonacci_recursive file in the given class examples
+  // repository.
   long long *output = NULL;
   long long *fib_array;
   fib_array = (long long *)malloc((sizeof(long long) * n));
+
 
   for (int i = 0; i < n; i++) {
     if (n == 0 || n == 1) {
       *output = 1;
     } else {
-      *output = *fibonacci_numbers(n - 1) + *fibonacci_numbers(n - 2);
+     *output = *fibonacci_numbers(n - 1) + *fibonacci_numbers(n - 2);
     }
 
     fib_array[i] = *output;
   }
 
-  return fib_array;
+  return output;
 }
 
 // PROBLEM 2
@@ -37,8 +39,8 @@ typedef struct {
 
 void bubble_sort_customers(ShoeCustomer *customers, int n_customers) {
   // Your code here! Make them sorted!
-  // Bubble sort algorithm heavily based upon "Optimized Bubble Sort" generalized pseudo under the
-  // Bubble Sort wikipedia page
+  // Bubble sort algorithm heavily based upon "Optimized Bubble Sort"
+  // generalized pseudo under the Bubble Sort wikipedia page
   ShoeCustomer *temp;
   bool swapped;
   do {
@@ -78,15 +80,15 @@ LLfloat *map_floats(float (*f)(float), LLfloat *numbers) {
   // given inspiration from the "map.c" file in the class demos repository
   int count = 0;
   LLfloat *current = numbers;
-  while(current != NULL) {
-      count++;
-      current = current->next;
+  while (current != NULL) {
+    count++;
+    current = current->next;
   }
 
   LLfloat *output;
   output = (LLfloat *)malloc((sizeof(LLfloat) * count));
   for (int i = 0; i < count; i++) {
-      output[i].val = f(numbers[i].val);
+    output[i].val = f(numbers[i].val);
   }
 
   return output;
@@ -96,13 +98,23 @@ LLfloat *map_floats(float (*f)(float), LLfloat *numbers) {
 
 unsigned long compute_availability(unsigned long *calendars, int num_users) {
   unsigned long availability = 0;
-  from (int i = 0; i < num_users; i++)
-  {
-      if (calendars & 0x1)
+  int testing_bit = 0;
+  while (testing_bit < sizeof(unsigned long)) {
+    for (int i = 0; i < num_users; i++) {
+      if (calendars[i] & 0x1) {
+        availability = (availability | (1 << (testing_bit - 1)));
+      } else {
+        availability = (availability & (~(1 << (testing_bit - 1))));
+      }
+      testing_bit++;
+      calendars[i] = calendars[i] >> 1;
+    }
   }
   return availability;
 }
-
 // put examples for testing your functions in the main! You're going to have to
 // figure out how to test these.
-int main(void) { return 0; }
+int main(void) {
+  printf("%llu\n", *fibonacci_numbers(6));
+  return 0;
+}
