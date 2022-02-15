@@ -23,10 +23,9 @@ bool set_contains(LLint *set, int val) {
   }
 }
 
-//written path contains
+// written path contains
 
-bool path_contains(LLPath *path, int v)
-{
+bool path_contains(LLPath *path, int v) {
   if (path == NULL) {
     return false;
   } else {
@@ -116,49 +115,76 @@ void print_path(Path path) {
   puts("");
 }
 
+LLint *enqueue(LLint *q, int val) {
+    LLint *newnode = calloc(1, sizeof(LLint));
+    newnode->val = val;
+
+    if (q == NULL) {
+        return newnode;
+    }
+
+    LLint *cur = q;
+    while(cur->next != NULL) {
+        cur = cur->next;
+    }
+    cur->next = newnode;
+    return q;
+}
+
+bool dequeue(LLint **q, int *ret) {
+    if (*q == NULL) {
+        return false;
+    }
+
+    *ret = (*q)->val;
+
+    LLint *freethis = *q;
+    *q = (*q)->next;
+    free(freethis);
+    return true;
+}
+
 // Breadth-first search!
 Path graph_find_path_bfs(Graph *g, int i, int j) {
-  // YOUR CODE HERE.
-  // keep track of a set of paths that we have visited
-  // keep a queue of paths that we want to visit
-  // while I have more paths to visit
-  //    get the next path to visit
-  //    see if it's where we're going (Path.vertices_visted[j] == j)
-  //    if it's not, enqueue of all the neighbor paths that have not been
-  //    visited
-  // return false if we're out of paths
+  // YOUR CODE HERE
+  //LLPath *to_visit = NULL;
+  //LLPath *visited = NULL;
+  LLPath *to_visit = calloc(1, sizeof(LLPath));
+  LLPath *visited = calloc(1, sizeof(LLPath));
+  //to_visit2->val.steps = 1;
+  //LLint *visited = NULL;
+  //LLint *to_visit = NULL;
 
-  // Path *visited = NULL;
-  //LLPath *to_visit = calloc(1, sizeof(LLPath));
-
- LLPath *to_visit = NULL;
-
-
+  //to_visit = enqueue(to_visit, i);
   to_visit->val = path_extend(to_visit->val, i);
+  //to_visit->val.vertices_visited[i] = i;
   to_visit = enqueue_path(to_visit, to_visit->val);
 
   while (to_visit != NULL) {
+      Path current;
+      //dequeue_path(&to_visit, &to_visit->val);
+      dequeue_path(&to_visit, &current);
 
-    dequeue_path(&to_visit,  &to_visit->val);
-    for (int i = 0; i < to_visit->val.steps; i++) {
-        if (to_visit->val.vertices_visited[i] == j) {
-            return to_visit->val;
+      for (int k = 0; k < current.steps; i++) {
+        if (current.vertices_visited[k] == j) {
+          return current;
         }
-    }
-
-    to_visit->val = path_extend(to_visit->val, i);
-    to_visit = enqueue_path(to_visit, to_visit->val);
-
-    for (int neighbor = 0; neighbor < g->vertices; neighbor++) {
-      if (graph_has_edge(g, i,
-                         neighbor) &&
-          !(path_contains(to_visit, neighbor))) {
-        to_visit->val = path_extend(to_visit->val, neighbor);
-        to_visit = enqueue_path(to_visit, to_visit->val);
       }
-    }
-  }
+      //visited = add_to_set(visited, current);
+      visited = enqueue_path(visited, current);
 
+      //paths->next.val = path_extend(paths->val, i);
+      //paths->next->val.vertices_visited[paths->val.steps] = i;
+      //to_visit2->val.vertices_visited[current] = current;
+
+      for (int neighbor = 0; neighbor < g->vertices; neighbor++) {
+          if (graph_has_edge(g, current.vertices_visited[i], neighbor) && !path_contains(visited, neighbor)) {
+              //to_visit = enqueue(to_visit, neighbor);
+              to_visit->val = path_extend(to_visit->val, neighbor);
+              to_visit  = enqueue_path(to_visit, to_visit->val);
+          }
+      }
+  }
   Path empty = {0, {0}};
   return empty;
 }
@@ -176,7 +202,6 @@ bool path_push(LLPath *q, Path p) {
   return true;
 }
 */
-
 
 Path graph_find_path_dfs(Graph *g, int i, int j) {
   // YOUR CODE HERE.
