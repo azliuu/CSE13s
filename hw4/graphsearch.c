@@ -176,7 +176,7 @@ Path graph_find_path_bfs(Graph *g, int i, int j) {
     // dequeue_path(&to_visit, &to_visit->val);
     dequeue_path(&to_visit, &current);
 
-    for (int k = 0; k < current.steps; i++) {
+    for (int k = 0; k < current.steps; k++) {
       if (current.vertices_visited[k] == j) {
         return current;
       }
@@ -250,7 +250,43 @@ void graph_destroy(Graph **g) {
 
 Path graph_find_path_dfs(Graph *g, int i, int j) {
   // YOUR CODE HERE
+  if (i==j) {
+      Path node;
+      node.steps = 1;
+      node.vertices_visited[0] = i;
+      return node;
+  }
 
+  LLPath *to_visit = calloc(1, sizeof(LLPath));
+  LLint *visited = NULL;
+
+  Path starting;
+  starting = to_visit->val;
+  starting = path_extend(starting, i);
+
+  stack_push(to_visit, starting);
+
+  while(to_visit != NULL) {
+      Path current;
+
+      stack_pop(&to_visit, &current);
+      for (int k = 0; k < current.steps; k++) {
+          if (current.vertices_visited[k] == j) {
+              return current;
+          }
+      }
+
+      visited = add_to_set(visited, current.vertices_visited[i]);
+
+      for (int neighbor = 0; neighbor < g->vertices; neighbor++) {
+          if (graph_has_edge(g, current.vertices_visited[current.steps], neighbor) && !set_contains(visited,neighbor)) {
+              Path temp;
+              temp = current;
+              temp = path_extend(temp, neighbor);
+              stack_push(to_visit, temp);
+          }
+      }
+  }
 Path empty = {0, {0}};
 return empty;
 }
