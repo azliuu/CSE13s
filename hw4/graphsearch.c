@@ -116,96 +116,141 @@ void print_path(Path path) {
 }
 
 LLint *enqueue(LLint *q, int val) {
-    LLint *newnode = calloc(1, sizeof(LLint));
-    newnode->val = val;
+  LLint *newnode = calloc(1, sizeof(LLint));
+  newnode->val = val;
 
-    if (q == NULL) {
-        return newnode;
-    }
+  if (q == NULL) {
+    return newnode;
+  }
 
-    LLint *cur = q;
-    while(cur->next != NULL) {
-        cur = cur->next;
-    }
-    cur->next = newnode;
-    return q;
+  LLint *cur = q;
+  while (cur->next != NULL) {
+    cur = cur->next;
+  }
+  cur->next = newnode;
+  return q;
 }
 
 bool dequeue(LLint **q, int *ret) {
-    if (*q == NULL) {
-        return false;
-    }
+  if (*q == NULL) {
+    return false;
+  }
 
-    *ret = (*q)->val;
+  *ret = (*q)->val;
 
-    LLint *freethis = *q;
-    *q = (*q)->next;
-    free(freethis);
-    return true;
+  LLint *freethis = *q;
+  *q = (*q)->next;
+  free(freethis);
+  return true;
 }
 
 // Breadth-first search!
 Path graph_find_path_bfs(Graph *g, int i, int j) {
   // YOUR CODE HERE
-  //LLPath *to_visit = NULL;
-  //LLPath *visited = NULL;
-  LLPath *to_visit = calloc(1, sizeof(LLPath));
-  LLPath *visited = calloc(1, sizeof(LLPath));
-  //to_visit2->val.steps = 1;
-  //LLint *visited = NULL;
-  //LLint *to_visit = NULL;
+  // LLPath *to_visit = NULL;
+  // LLPath *visited = NULL;
+  //
+  if (i == j) {
+    Path node;
+    node.steps = 1;
+    node.vertices_visited[0] = i;
+    return node;
+  }
 
-  //to_visit = enqueue(to_visit, i);
-  to_visit->val = path_extend(to_visit->val, i);
-  //to_visit->val.vertices_visited[i] = i;
-  to_visit = enqueue_path(to_visit, to_visit->val);
+  LLPath *to_visit = calloc(1, sizeof(LLPath));
+  LLint *visited = NULL;
+  // to_visit2->val.steps = 1;
+  // LLint *visited = NULL;
+  // LLint *to_visit = NULL;
+
+  // to_visit = enqueue(to_visit, i);
+  Path starting; // starting node
+  starting = to_visit->val;
+  starting = path_extend(starting, i);
+  // to_visit->val.vertices_visited[i] = i;
+
+  to_visit = enqueue_path(to_visit, starting); // enqueue the starting node
 
   while (to_visit != NULL) {
-      Path current;
-      //dequeue_path(&to_visit, &to_visit->val);
-      dequeue_path(&to_visit, &current);
+    Path current;
+    // dequeue_path(&to_visit, &to_visit->val);
+    dequeue_path(&to_visit, &current);
 
-      for (int k = 0; k < current.steps; i++) {
-        if (current.vertices_visited[k] == j) {
-          return current;
-        }
+    for (int k = 0; k < current.steps; i++) {
+      if (current.vertices_visited[k] == j) {
+        return current;
       }
-      //visited = add_to_set(visited, current);
-      visited = enqueue_path(visited, current);
+    }
+    // visited = add_to_set(visited, current);
+    // current.vertices_visited[current.steps] = j;
+    visited = add_to_set(visited, current.vertices_visited[i]);
 
-      //paths->next.val = path_extend(paths->val, i);
-      //paths->next->val.vertices_visited[paths->val.steps] = i;
-      //to_visit2->val.vertices_visited[current] = current;
+    // paths->next.val = path_extend(paths->val, i);
+    // paths->next->val.vertices_visited[paths->val.steps] = i;
+    // to_visit2->val.vertices_visited[current] = current;
 
-      for (int neighbor = 0; neighbor < g->vertices; neighbor++) {
-          if (graph_has_edge(g, current.vertices_visited[i], neighbor) && !path_contains(visited, neighbor)) {
-              //to_visit = enqueue(to_visit, neighbor);
-              to_visit->val = path_extend(to_visit->val, neighbor);
-              to_visit  = enqueue_path(to_visit, to_visit->val);
-          }
+    for (int neighbor = 0; neighbor < g->vertices; neighbor++) {
+      if (graph_has_edge(g, current.vertices_visited[current.steps],
+                         neighbor) &&
+          !set_contains(visited, neighbor)) {
+        // to_visit = enqueue(to_visit, neighbor);
+        Path temp;
+        temp = current;
+        temp = path_extend(temp, neighbor);
+        // to_visit->val = path_extend(current, neighbor);
+        to_visit = enqueue_path(to_visit, temp);
       }
+    }
   }
   Path empty = {0, {0}};
   return empty;
 }
 
 // Depth-first search!
-/*
-bool path_push(LLPath *q, Path p) {
-  Node *newtop = (Node *)calloc(1, sizeof(Node));
-  if (newtop == NULL) {
+
+bool stack_push(LLPath *q, Path path) {
+  LLPath *newfront = calloc(1, sizeof(LLPath));
+  newfront->val = path;
+
+  if (q == NULL) {
+    return newfront;
+  }
+
+  LLPath *cur = q;
+  while (cur->next != NULL) {
+    cur = cur->next;
+  }
+  cur->next = newfront;
+
+  return q;
+}
+
+bool stack_pop(LLPath **q, Path *ret) {
+  if (*q == NULL) {
     return false;
   }
-  newtop->item = item;
-  newtop->next = s->top;
-  s->top = newtop;
+
+  *ret = (*q)->val;
+
+  LLPath *freethis = *q;
+  *q = (*q)->next;
+  free(freethis);
   return true;
 }
-*/
+
+void graph_destroy(Graph **g) {
+  int **child = (*g)->matrix;
+  while (child != NULL) {
+    free(&child);
+  }
+  free(*g);
+  g = NULL;
+  return;
+}
 
 Path graph_find_path_dfs(Graph *g, int i, int j) {
-  // YOUR CODE HERE.
+  // YOUR CODE HERE
 
-  Path empty = {0, {0}};
-  return empty;
+Path empty = {0, {0}};
+return empty;
 }
