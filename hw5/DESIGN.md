@@ -48,7 +48,7 @@ char **load_vocabulary(char *filename, size_t *num_words) {
             realloc array
             fclose the file after all the lines have been read
 ```
-`char **out` represents the dynamically allocated array of `char *` pointers containing each word read from the infile. In order to handle case issues `strupr()` can be used to guarantee the words are all capital letters ignoring case. As the array stores a word from each line of the infile, the array must be reallocated using `realloc` in order to fit the new word in the array.
+`char **out` represents the dynamically allocated array of `char *` pointers containing each word read from the infile. In order to handle case issues `tolower() in ctypes.h` can be used to guarantee the words are all lower-case letters ignoring the case of user's input. Lower case also matches the entries in the vocabulary.txt file. As the array stores a word from each line of the infile, the array must be reallocated using `realloc` in order to fit the new word in the array.
 
 ```
 void free_vocabulary(char **vocabulary, size_t num_words) {
