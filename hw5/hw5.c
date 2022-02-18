@@ -82,8 +82,18 @@ bool valid_guess(char *guess, char **vocabulary, size_t num_words) {
 char **load_vocabulary(char *filename, size_t *num_words) {
   char **out = NULL;
   //TODO(you): finish this function
+  char buf[1024];
+  FILE* infile;
+  int c;
+  infile = fopen(filename, "r");
   out = (char**)malloc(sizeof(char*)*(unsigned long)num_words);
-
+  while(fgets(buf, 1024, infile) != NULL) {
+      num_words++;
+      out = (char **) realloc(out, (unsigned long )num_words);
+      char *temp = strdup(buf);
+      out[num_words-(unsigned long)1] = temp;
+  }
+  fclose(infile);
   return out;
 }
 
