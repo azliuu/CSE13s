@@ -77,20 +77,26 @@ char **load_vocabulary(char *filename, size_t *num_words) {
   char buf[7];
   FILE *infile;
   size_t words_read = 0;
+  num_words = 0;
   infile = fopen(filename, "r");
-  out = (char **)calloc(100, sizeof(char *));
-  for (int i = 0; i < 100; i += 1) {
+  out = (char **)calloc(500, sizeof(char *));
+  for (int i = 0; i < 500; i += 1) {
     out[i] = (char *)calloc(7, sizeof(char));
   }
 
   while (fgets(buf, 1024, infile)) {
     line = strndup(buf, 5);
+    printf("line : %s\n", line);
+    printf("size of out: %zu\n", sizeof(out));
     strcpy(out[words_read], line);
+    printf("out[words_read] : %s\n", out[words_read]);
+    printf("%zu\n", words_read);
     words_read++;
 
     free(line);
-    if (((words_read % 100) == 0)) {
-      char **newOut = realloc(out, 100 * sizeof(char));
+    if (words_read % 500 ==  0) {
+        printf("reaalloc\n");
+      char **newOut = realloc(out, 500 * sizeof(char));
       if (newOut != NULL) {
         out = newOut;
       }
