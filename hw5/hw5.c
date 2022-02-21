@@ -18,32 +18,23 @@
 //   5. (ie, at least 6 bytes long)
 bool score_guess(char *secret, char *guess, char *result) {
   // TODO(you): finish this function
-  /*
-  char low_secret = strdup(secret);
-  for (int k = 0; k < low_secret; k++) {
-      low_secret[k] = tolower(secret[k]);
-  }
-  char low_guess = strdup(guess);
-  for (int l = 0; l < low_guess; l++) {
-      low_guess[l] = tolower(guess[l]);
-  }
-  */
+
   for (int i = 0; secret[i] != '\0'; i++) {
-      for (int j = 0; guess[j] != '\0'; j++) {
-          guess[j] = tolower(guess[j]);
-          secret[i] = tolower(secret[i]);
-        if ((secret[i] != guess[i]) && (secret[i] != guess[j])) {
-          result[i] = 'x';
-        }
-        if ((secret[i] != guess[i]) && (guess[j] == secret[i])) {
-          result[i] = 'y';
-        }
-        if (secret[i] == guess[j])
-          result[i] = 'g';
-        }
-        if (strcmp(secret, guess) == 0) {
-            return true;
-        }
+    for (int j = 0; guess[j] != '\0'; j++) {
+      guess[j] = tolower(guess[j]);
+      secret[i] = tolower(secret[i]);
+      if ((secret[i] != guess[i]) && (secret[i] != guess[j])) {
+        result[i] = 'x';
+      }
+      if ((guess[j] == secret[i]) && (guess[i] != secret[i])) {
+        result[i] = 'y';
+      }
+      if (secret[i] == guess[i])
+        result[i] = 'g';
+    }
+    if (strncmp(secret, guess, 5) == 0) {
+      return true;
+    }
   }
   return false;
 }
@@ -54,13 +45,13 @@ bool score_guess(char *secret, char *guess, char *result) {
 // but consider: could you do this search more quickly?
 bool valid_guess(char *guess, char **vocabulary, size_t num_words) {
   // TODO(you): finish this function
-  for (int i = 0; i != '\0'; i++) {
-      guess[i] = tolower(guess[i]);
+  for (int i = 0; guess[i] != '\0'; i++) {
+    guess[i] = tolower(guess[i]);
   }
   for (unsigned long i = 0; i < num_words; i++) {
-      if (strcmp(guess, vocabulary[i]) == 0) {
-          return true;
-      }
+    if (strcmp(guess, vocabulary[i]) == 0) {
+      return true;
+    }
   }
   return false;
 }
@@ -81,18 +72,27 @@ bool valid_guess(char *guess, char **vocabulary, size_t num_words) {
 // null-terminated.
 char **load_vocabulary(char *filename, size_t *num_words) {
   char **out = NULL;
-  //TODO(you): finish this function
-  char buf[1024];
-  FILE* infile;
-  int c;
+  // TODO(you): finish this function
+  char *line = NULL;
+  char buf[7];
+  FILE *infile;
+  size_t words_read = 0;
   infile = fopen(filename, "r");
-  out = (char**)malloc(sizeof(char*)*(unsigned long)num_words);
-  while(fgets(buf, 1024, infile) != NULL) {
-      num_words++;
-      out = (char **) realloc(out, (unsigned long )num_words);
-      char *temp = strdup(buf);
-      out[num_words-(unsigned long)1] = temp;
+  out = calloc(100, sizeof(char *));
+  while (fgets(buf, 1024, infile) != NULL) {
+    line = strndup(buf, 5);
+    out[words_read] = line;
+    words_read++;
   }
+
+  free(line);
+  if (num_words - words_read == 0) {
+    char **newOut = realloc(out, 100 * sizeof(char));
+    if (newOut != NULL) {
+      out = newOut;
+    }
+  }
+
   fclose(infile);
   return out;
 }
@@ -101,6 +101,11 @@ char **load_vocabulary(char *filename, size_t *num_words) {
 // itself (which points to an array of char *).
 void free_vocabulary(char **vocabulary, size_t num_words) {
   // TODO(you): finish this function
+  for (unsigned long i = 0; i < num_words; i++) {
+    free(&vocabulary[i]);
+  }
+  free(vocabulary);
+  vocabulary = NULL;
 }
 
 // Once your other functions are working, please revert your main() to its
