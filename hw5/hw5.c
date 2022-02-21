@@ -78,84 +78,88 @@ char **load_vocabulary(char *filename, size_t *num_words) {
   FILE *infile;
   size_t words_read = 0;
   infile = fopen(filename, "r");
-  out = calloc(100, sizeof(char *));
-  while (fgets(buf, 1024, infile) != NULL) {
+  out = (char **)calloc(100, sizeof(char *));
+  for (int i = 0; i < 100; i += 1) {
+    out[i] = (char *)calloc(7, sizeof(char));
+  }
+
+  while (fgets(buf, 1024, infile)) {
     line = strndup(buf, 5);
-    out[words_read] = line;
+    strcpy(out[words_read], line);
     words_read++;
-  }
 
-  free(line);
-  if (num_words - words_read == 0) {
-    char **newOut = realloc(out, 100 * sizeof(char));
-    if (newOut != NULL) {
-      out = newOut;
+    free(line);
+    if (((words_read % 100) == 0)) {
+      char **newOut = realloc(out, 100 * sizeof(char));
+      if (newOut != NULL) {
+        out = newOut;
+      }
     }
   }
-
-  fclose(infile);
-  return out;
+    fclose(infile);
+    *num_words = words_read;
+    return out;
 }
 
-// Free each of the strings in the vocabulary, as well as the pointer vocabulary
-// itself (which points to an array of char *).
-void free_vocabulary(char **vocabulary, size_t num_words) {
-  // TODO(you): finish this function
-  for (unsigned long i = 0; i < num_words; i++) {
-    free(&vocabulary[i]);
-  }
-  free(vocabulary);
-  vocabulary = NULL;
-}
-
-// Once your other functions are working, please revert your main() to its
-// initial state, but please feel free to change it, during development. You'll
-// want to test out each individual function!
-int main(void) {
-  char **vocabulary;
-  size_t num_words;
-  int num_guesses = 0;
-
-  srand(time(NULL));
-
-  // load up the vocabulary and store the number of words in it.
-  vocabulary = load_vocabulary("vocabulary.txt", &num_words);
-
-  // Randomly select one of the words from the file to be today's SECRET WORD.
-  int word_index = rand() % num_words;
-  char *secret = vocabulary[word_index];
-
-  // input buffer -- we'll use this to get a guess from the user.
-  char guess[80];
-
-  // buffer for scoring each guess.
-  char result[6] = {0};
-  bool success = false;
-
-  printf("time to guess a 5-letter word! (press ctrl-D to exit)\n");
-  while (!success) {
-    printf("guess: ");
-    if (fgets(guess, 80, stdin) == NULL) {
-      break;
+  // Free each of the strings in the vocabulary, as well as the pointer
+  // vocabulary itself (which points to an array of char *).
+  void free_vocabulary(char **vocabulary, size_t num_words) {
+    // TODO(you): finish this function
+    for (unsigned long i = 0; i < num_words; i++) {
+      free(&vocabulary[i]);
     }
-    // Whatever the user input, cut it off at 5 characters.
-    guess[5] = '\0';
+    free(vocabulary);
+    vocabulary = NULL;
+  }
 
-    if (!valid_guess(guess, vocabulary, num_words)) {
-      printf("not a valid guess\n");
-      continue;
-    } else {
-      num_guesses++;
+  // Once your other functions are working, please revert your main() to its
+  // initial state, but please feel free to change it, during development.
+  // You'll want to test out each individual function!
+  int main(void) {
+    char **vocabulary;
+    size_t num_words;
+    int num_guesses = 0;
+
+    srand(time(NULL));
+
+    // load up the vocabulary and store the number of words in it.
+    vocabulary = load_vocabulary("vocabulary.txt", &num_words);
+
+    // Randomly select one of the words from the file to be today's SECRET WORD.
+    int word_index = rand() % num_words;
+    char *secret = vocabulary[word_index];
+
+    // input buffer -- we'll use this to get a guess from the user.
+    char guess[80];
+
+    // buffer for scoring each guess.
+    char result[6] = {0};
+    bool success = false;
+
+    printf("time to guess a 5-letter word! (press ctrl-D to exit)\n");
+    while (!success) {
+      printf("guess: ");
+      if (fgets(guess, 80, stdin) == NULL) {
+        break;
+      }
+      // Whatever the user input, cut it off at 5 characters.
+      guess[5] = '\0';
+
+      if (!valid_guess(guess, vocabulary, num_words)) {
+        printf("not a valid guess\n");
+        continue;
+      } else {
+        num_guesses++;
+      }
+      success = score_guess(secret, guess, result);
+      printf("%s\n", guess);
+      printf("%s\n", result);
     }
-    success = score_guess(secret, guess, result);
-    printf("%s\n", guess);
-    printf("%s\n", result);
-  }
 
-  if (success) {
-    printf("you win, in %d guesses!\n", num_guesses);
-  }
-  free_vocabulary(vocabulary, num_words);
+    if (success) {
+      printf("you win, in %d guesses!\n", num_guesses);
+    }
+    free_vocabulary(vocabulary, num_words);
 
-  return 0;
-}
+    return 0;
+  }
