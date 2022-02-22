@@ -18,7 +18,6 @@
 //   5. (ie, at least 6 bytes long)
 bool score_guess(char *secret, char *guess, char *result) {
   // TODO(you): finish this function
-  printf("secret word is: %s\n", secret);
   for (int i = 0; secret[i] != '\0'; i++) {
     for (int j = 0; guess[j] != '\0'; j++) {
       guess[j] = tolower(guess[j]);
