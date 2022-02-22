@@ -33,7 +33,7 @@ bool score_guess(char *secret, char *guess, char *result) {
        return false
 }
 ```
-The result has enough memory for a string of length 5 (at least 6 bytes long). So the loop should go until reaching the null character '\0' in the guess/secret chars. In order to handle case issues `tolower() in ctypes.h` can be used to guarantee the words are all lower-case letters ignoring the case of user's input.  Setting/checking each letter can be done by treating the chars as an array `guess[j]` `result[j]` and `secret[i]`. By using two for loops, each letter in guess can be checked with every letter in the secret word in order to satisfy each check.
+The result has enough memory for a string of length 5 (at least 6 bytes long). So the loop should go until reaching the null character '\0' in the guess/secret chars. In order to handle case issues `tolower() in ctypes.h` can be used to guarantee the words are all lower-case letters ignoring the case of user's input. The `strchr()` function can be used to find if the letter of guess appears in the secret word at all (the case where result's location should be 'y') since it returns NULL if the char is not in the secret word. Setting/checking each letter can be done by treating the chars as an array `guess[i]` `result[i]` and `secret[i]`. By using two for loops, each letter in guess can be checked with every letter in the secret word in order to satisfy each check. Lastly we can check if guess is an exact copy of the secret word using `strcmp()`. If they are exactly the same, every letter in result should be 'g' and true should be returned. Otherwise we return false.
 ```
 bool valid_guess(char *guess, char **vocabulary, size_t num_words) {
             Loop through the list of accepted words.
