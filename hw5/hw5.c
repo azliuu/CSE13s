@@ -77,7 +77,6 @@ bool valid_guess(char *guess, char **vocabulary, size_t num_words) {
 char **load_vocabulary(char *filename, size_t *num_words) {
   char **out = NULL;
   // TODO(you): finish this function
-  char *line = NULL;
   char buf[7];
   FILE *infile;
   size_t words_read = 0;
@@ -85,29 +84,19 @@ char **load_vocabulary(char *filename, size_t *num_words) {
   infile = fopen(filename, "r");
 
   out = (char **)calloc(10, sizeof(char *));
-  for (int i = 0; i < 10; i += 1) {
-    out[i] = (char *)calloc(7, sizeof(char));
-  }
 
   while (fgets(buf, 1024, infile) != NULL) {
-    line = strndup(buf, 5);
-    strcpy(out[words_read], line);
+    out[words_read] = strndup(buf, 5);
     words_read++;
 
     if (words_read % 10 == 0 && words_read != 0) {
       times_realloc += 10;
-      // out = (char **) realloc(out, (times_realloc + 10) * sizeof(char *));
       char **newOut = realloc(out, (times_realloc + 10) * sizeof(char *));
       if (newOut != NULL) {
         out = newOut;
       }
-      for (int i = 0; i < 10; i += 1) {
-        out[i + (times_realloc)] = (char *)calloc(7, sizeof(char));
-      }
     }
   }
-
-  // free(line);
 
   *num_words = words_read;
 

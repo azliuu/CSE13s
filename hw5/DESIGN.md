@@ -19,15 +19,21 @@ A guess is valid if it is a 5-letter string of ASCII characters a-z, and it is o
 bool score_guess(char *secret, char *guess, char *result) {
         Loop through each character in the secret word with increment i.
             Loop through each character in the guess word with increment j.
+                set each character of guess to lower case
+                set each character of secret to lower case
                 if the guess[j] does not appear in any of the the secret word slots [i]
                         add 'x' to the result[j] position.
                 if the letter in the guess appears in the secret word, but is not in the corresponding slot
                         add 'y' to the result[j] position.
                 if the letter in the guess matches the corresponding letter in the secret word
                        add 'g' to the result[j] position.
+                if guess is an exact match with secret
+                        set all the characters in result to 'g'
+                        and return true
+       return false
 }
 ```
-The result has enough memory for a string of length 5 (at least 6 bytes long). So the loop should go until reaching the null character '\0' in the guess char. Setting/checking each letter can be done by treating the chars as an array `guess[j]` `result[j]` and `secret[i]`. By using two for loops, each letter in guess can be checked with every letter in the secret word in order to satisfy each check.
+The result has enough memory for a string of length 5 (at least 6 bytes long). So the loop should go until reaching the null character '\0' in the guess/secret chars. In order to handle case issues `tolower() in ctypes.h` can be used to guarantee the words are all lower-case letters ignoring the case of user's input.  Setting/checking each letter can be done by treating the chars as an array `guess[j]` `result[j]` and `secret[i]`. By using two for loops, each letter in guess can be checked with every letter in the secret word in order to satisfy each check.
 ```
 bool valid_guess(char *guess, char **vocabulary, size_t num_words) {
             Loop through the list of accepted words.
@@ -39,16 +45,24 @@ A Linear search can be used to loop through the vocab words, but for our use-cas
 ```
 char **load_vocabulary(char *filename, size_t *num_words) {
             char **out = NULL;
+            create a buffer of size 7 to store the line of the file
             set the number of words read to be zero.
-            dynamically allocate an array
-            use realloc to increase the size ofthe array over time.
-            open the input file
-            strdup the line/word from the file into out
-            increment the num_words read
-            realloc array
-            fclose the file after all the lines have been read
+            set a variable representing number of memory reallocations
+            open the file with read permissions given the filename
+            dynamically allocate out as an array of words
+            while there are still lines to be read
+                    set out at words_read equal to the first 5 characters of buffer
+                    increment words_read variable
+            if words_read is a multiple of 10 and not equal to zero
+                    increment number of times allocated by 10
+                    reallocate memory by creating a newOut variable of the same type and pass it out with the number of times reallocated + 10
+                    if reallocation did not fail
+                            set out equal to newout
+            set num_words equal to words_read
+            close the file
+            return out
 ```
-`char **out` represents the dynamically allocated array of `char *` pointers containing each word read from the infile. In order to handle case issues `tolower() in ctypes.h` can be used to guarantee the words are all lower-case letters ignoring the case of user's input. Lower case also matches the entries in the vocabulary.txt file. As the array stores a word from each line of the infile, the array must be reallocated using `realloc` in order to fit the new word in the array.
+`char **out` represents the dynamically allocated array of `char *` pointers containing words. A buffer is needed in order to store the line read from each file. The buffer is of length 7 because each line in the file contains a hidden `\0 and newline` character on top of being a 5 letter word. In order to properly reallocate memory, a variable must be used to track how much memory has been used. Once the number of words read is divisable by 10 (each block of memory), then more memory must be allocated. First a variable that tracks the number of times allocated is incremented by 10. Then realloc is used with the number of times allocated + 10 in order to add additional memory. If memory reallocation did not fail, we can set out to the newOut variable. Lastly we set `num_words` equal to the number of words read, close the file, and return out.
 
 ```
 void free_vocabulary(char **vocabulary, size_t num_words) {
@@ -58,4 +72,4 @@ void free_vocabulary(char **vocabulary, size_t num_words) {
         set vocabulary equal to NULL.
 }
 ```
-Frees the strings in vocabulary, and the pointer vocabulary itself.
+Frees the words in vocabulary, and the pointer vocabulary itself.

@@ -6,7 +6,7 @@ CC = clang
 
 # You can comment this out and use the above CFLAGS instead if you need to,
 # during development.
-CFLAGS = -Wall -Wpedantic -Werror -Wextra
+CFLAGS = -g -Wall -Wpedantic -Werror -Wextra
 
 
 all: hw5
@@ -18,4 +18,4 @@ clean:
 	rm -f hw5
 
 format:
-	clang-format -i -style=file *.{c,h}
+	clang-format -i -style=file *.[c,h]
