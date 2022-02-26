@@ -14,12 +14,11 @@ int score_letter(char letter, char **vocabulary, size_t num_words) {
   // TODO(you): implement this function!
   int letter_count = 0;
   for (int i = 0; i < num_words; i++) {
-    if (vocabulary[i] != NULL) {
-      if (strchr(vocabulary[i], letter) != NULL) {
-        letter_count++;
-      }
-    } else {
+    if (vocabulary[i] == NULL) {
       continue;
+    }
+    if (strchr(vocabulary[i], letter) != NULL) {
+      letter_count++;
     }
   }
   return letter_count;
@@ -37,11 +36,13 @@ int score_word(char *word, int *letter_scores) {
   // note to self: check for only unique characters
   int score = 0;
   char unique[4];
-  for (int i = 0; i < 4; i++) {
+  //unique[0] = word[0];
+  //printf("this is word[0] %c\n", word[0]);
+  for (int i = 0; i < 5; i++) {
     if (strchr(unique, word[i]) == NULL) {
       unique[i] = word[i];
     }
-    score += letter_scores[unique[i] - 'a'];
+    score += letter_scores[word[i] - 'a'];
   }
   return score;
 }
@@ -83,6 +84,9 @@ size_t filter_vocabulary_gray(char letter, char **vocabulary,
   // TODO(you): implement this function!
   size_t words_filtered = 0;
   for (int i = 0; i < num_words; i++) {
+    if (vocabulary[i] == NULL) {
+        continue;
+    }
     if (strchr(vocabulary[i], letter) != NULL) {
       words_filtered += 1;
       free(vocabulary[i]);
@@ -102,16 +106,14 @@ size_t filter_vocabulary_yellow(char letter, int position, char **vocabulary,
   // TODO(you): implement this function!
   size_t words_filtered = 0;
   for (int i = 0; i < num_words; i++) {
-      if (strchr(vocabulary[i], letter) == NULL) {
-          free(vocabulary[i]);
-          vocabulary[i] = NULL;
-          words_filtered += 1;
+      if (vocabulary[i] == NULL) {
+          continue;
       }
-      else if (vocabulary[i][position] == letter) {
-          free(vocabulary[i]);
-          vocabulary[i] = NULL;
-          words_filtered += 1;
-      }
+    if ((strchr(vocabulary[i], letter) == NULL) || (vocabulary[i][position] != letter)) {
+      free(vocabulary[i]);
+      vocabulary[i] = NULL;
+      words_filtered += 1;
+    }
   }
   return words_filtered;
 }
@@ -126,11 +128,14 @@ size_t filter_vocabulary_green(char letter, int position, char **vocabulary,
   // TODO(you): implement this function!
   size_t words_filtered = 0;
   for (int i = 0; i < num_words; i++) {
-          if (vocabulary[i][position] != letter) {
-              free(vocabulary[i]);
-              vocabulary[i] = NULL;
-              words_filtered+=1;
-          }
+      if (vocabulary[i] == NULL) {
+          continue;
+      }
+    if (vocabulary[i][position] != letter) {
+      free(vocabulary[i]);
+      vocabulary[i] = NULL;
+      words_filtered += 1;
+    }
   }
   return words_filtered;
 }
