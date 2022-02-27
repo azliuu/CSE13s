@@ -22,6 +22,12 @@ int main(void) {
 
   // You don't have to mess with your functions in here, but you might like to
   // do that.
+
+  // TESTING LETTER SCORE
+  char letter = 'i';
+  printf("letter score: %d\n", score_letter(letter, vocabulary, num_words));
+
+
   free_vocabulary(vocabulary, num_words);
 
   return 0;
