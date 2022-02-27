@@ -1,4 +1,4 @@
-#Homework 6: Strings, Seraching, Pointers!
+# Homework 6: Strings, Seraching, Pointers!
 We will implement a Wordle solver. The solver will either iteratively suggest guesses to it's user to search for the solution, or have a secret word be specified for testing purposes in order to cut down the search space until the word is found.
 
 ## Scoring Letters / Scoring Words
@@ -25,7 +25,7 @@ int score_word(char *word, int *letter_scores) {
 ```
 In order to ensure that there only unique characters cause an increment to the word score, we can use the `strchr()` function with a separate char array containing each letter in the alphabet, and each word of the letter. Then we can loop through each letter of the alphabet. If the function does not return NULL, then we know the specific letter is found in the word. Then we can simply add the corresponding letter score to score at the position of `letter_scores[alphabet[i]- 'a']` in order to get the corresponding index of the letter.
 
-##Filtering Words
+## Filtering Words
 ```
 size_t filter_vocabulary_gray(char letter, char **vocabulary, size_t num_words) {
         create a variable the counts how many words have been filtered
