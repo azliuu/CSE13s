@@ -35,14 +35,15 @@ int score_word(char *word, int *letter_scores) {
   // TODO(you): implement this function!
   // note to self: check for only unique characters
   int score = 0;
-  char unique[4];
-  //unique[0] = word[0];
-  //printf("this is word[0] %c\n", word[0]);
-  for (int i = 0; i < 5; i++) {
-    if (strchr(unique, word[i]) == NULL) {
-      unique[i] = word[i];
+  // unique[0] = word[0];
+  // printf("this is word[0] %c\n", word[0]);
+  char alphabet[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+                       'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+                       's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+  for (int i = 0; i < 26; i++) {
+    if (strchr(word, alphabet[i]) != NULL) {
+      score += letter_scores[alphabet[i] - 'a'];
     }
-    score += letter_scores[word[i] - 'a'];
   }
   return score;
 }
@@ -85,7 +86,7 @@ size_t filter_vocabulary_gray(char letter, char **vocabulary,
   size_t words_filtered = 0;
   for (int i = 0; i < num_words; i++) {
     if (vocabulary[i] == NULL) {
-        continue;
+      continue;
     }
     if (strchr(vocabulary[i], letter) != NULL) {
       words_filtered += 1;
@@ -106,10 +107,11 @@ size_t filter_vocabulary_yellow(char letter, int position, char **vocabulary,
   // TODO(you): implement this function!
   size_t words_filtered = 0;
   for (int i = 0; i < num_words; i++) {
-      if (vocabulary[i] == NULL) {
-          continue;
-      }
-    if ((strchr(vocabulary[i], letter) == NULL) || (vocabulary[i][position] != letter)) {
+    if (vocabulary[i] == NULL) {
+      continue;
+    }
+    if ((strchr(vocabulary[i], letter) == NULL) ||
+        (vocabulary[i][position] == letter)) {
       free(vocabulary[i]);
       vocabulary[i] = NULL;
       words_filtered += 1;
@@ -128,9 +130,9 @@ size_t filter_vocabulary_green(char letter, int position, char **vocabulary,
   // TODO(you): implement this function!
   size_t words_filtered = 0;
   for (int i = 0; i < num_words; i++) {
-      if (vocabulary[i] == NULL) {
-          continue;
-      }
+    if (vocabulary[i] == NULL) {
+      continue;
+    }
     if (vocabulary[i][position] != letter) {
       free(vocabulary[i]);
       vocabulary[i] = NULL;
