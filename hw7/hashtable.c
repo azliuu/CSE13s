@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +11,7 @@ typedef struct FriendNode {
   struct FriendNode *next;
 } FriendNode;
 
-#define NUM_BUCKETS 10
+#define NUM_BUCKETS 15
 
 // Thank you Dan Bernstein.
 unsigned long hash(char *str) {
@@ -25,18 +26,34 @@ unsigned long hash(char *str) {
   return hash;
 }
 
+// issue: adds a new node even if email is already found.
 FriendNode *add_friend_to_list(char *email, char *name, char *food,
                                int shoe_size, FriendNode *bucket) {
-  FriendNode *new_friend;
 
-  new_friend = malloc(sizeof(FriendNode));
-  new_friend->email = strdup(email);
-  new_friend->name = strdup(name);
-  new_friend->fav_food = strdup(food);
-  new_friend->shoe_size = shoe_size;
-  new_friend->next = bucket;
+  // intended logic:
+  // check for if the current bucket already contains a user with that email
+  // if so then override that user's information with the new info
+  // else, create a new node with the new info.
+  FriendNode *node;
+  node = bucket;
+  while (node != NULL) {
+    if (strcmp(node->email, email) != 0) {
 
-  return new_friend;
+      node = malloc(sizeof(FriendNode));
+      node->email = strdup(email);
+      node->name = strdup(name);
+      node->fav_food = strdup(food);
+      node->shoe_size = shoe_size;
+      node->next = bucket;
+      return node;
+    } else {
+    node->name = strdup(name);
+    node->fav_food = strdup(food);
+    node->shoe_size = shoe_size;
+    }
+    node = node->next;
+  }
+  return node;
 }
 
 void add_friend_to_hashtable(char *email, char *name, char *food, int shoe_size,
@@ -46,60 +63,86 @@ void add_friend_to_hashtable(char *email, char *name, char *food, int shoe_size,
 
   buckets[which_bucket] =
       add_friend_to_list(email, name, food, shoe_size, buckets[which_bucket]);
-
+  // debug check for collisions
   printf("customer [%s] goes in bucket [%lu] \n", email, which_bucket);
 }
+/*
+bool delete_friend(char *email, FriendNode **buckets, size_t num_buckets) {
+    size_t which_bucket = hash(email) % num_buckets;
+    FriendNode *node;
+    node = buckets[which_bucket];
 
-char *fav_food_for_friend(char *email, FriendNode **buckets,
+    while (node != NULL) {
+        FriendNode *temp = node;
+        if (strcmp(node->email, email) == 0) {
+            node = temp->next;
+            free(temp->email);
+            free(temp->name);
+            free(temp->fav_food);
+            free(temp->shoe_size);
+            free(temp);
+            return true;
+        }
+        else {
+            node = node->next;
+        }
+    }
+    return false;
+}
+*/
+bool lookup_customer_info(char *email, FriendNode **buckets,
                           size_t num_buckets) {
-
   size_t which_bucket = hash(email) % num_buckets;
+  int shoe_size = 0;
+  char *name = NULL;
+  char *food = NULL;
 
-  char *result = NULL;
   FriendNode *node;
   node = buckets[which_bucket];
 
   while (node != NULL) {
     if (strcmp(node->email, email) == 0) {
-      result = node->fav_food;
+      shoe_size = node->shoe_size;
+      name = node->name;
+      email = node->email;
+      food = node->fav_food;
     }
     node = node->next;
   }
-  return result;
-}
-
-char *name_of_friend(char *email, FriendNode **buckets, size_t num_buckets) {
-  size_t which_bucket = hash(email) % num_buckets;
-
-  char *result = NULL;
-  FriendNode *node;
-  node = buckets[which_bucket];
-
-  while (node != NULL) {
-    if (strcmp(node->email, email) == 0) {
-      result = node->name;
-    }
-    node = node->next;
+  // IF THE NAME WAS REPLACED BY A VALUE FOUND IN HASHTABLE
+  if (name != NULL) {
+    printf("email: %s\n", email);
+    printf("name: %s\n", name);
+    printf("shoesize: %d\n", shoe_size);
+    printf("food: %s\n", food);
+    printf("\n");
+    return true;
+  } else {
+    // the user was not found because default value was not replaced
+    printf("user not found!\n");
   }
-  return result;
+  return false;
 }
 
-int shoe_size_of_friend(char *email, FriendNode **buckets, size_t num_buckets) {
-  size_t which_bucket = hash(email) % num_buckets;
-
-  int result = 0;
-  FriendNode *node;
-  node = buckets[which_bucket];
-
-  while (node != NULL) {
-    if (strcmp(node->email, email) == 0) {
-      result = node->shoe_size;
+void list_customers(FriendNode **buckets, size_t num_buckets) {
+  for (int i = 0; i < num_buckets; i++) {
+    FriendNode *node;
+    node = buckets[i];
+    //if the node isn't null and the node contains just one entry
+    //lookup the customer to print their info
+    if ((node != NULL) && (sizeof(node) == 1)) {
+      lookup_customer_info(node->email, buckets, num_buckets);
+    } else {
+        //otherwise the node contains more than one entry, list until end of Linked List
+      while (node != NULL) {
+        lookup_customer_info(node->email, buckets, num_buckets);
+        node = node->next;
+      }
     }
-    node = node->next;
   }
-  return result;
 }
 
+// TESTING FOR EACH HASH FUNCTION
 int main(void) {
 
   unsigned long hashed;
@@ -122,29 +165,24 @@ int main(void) {
   add_friend_to_hashtable("s@gmail.com", "sally", "roti", 14, buckets,
                           NUM_BUCKETS);
 
-  char *fav_food = NULL;
-  char *name = NULL;
-  int shoe_size = 0;
-  fav_food = fav_food_for_friend("h@gmail.com", buckets, NUM_BUCKETS);
-  printf("fav food for henrietta: %s\n", fav_food);
+  // LOOKUP FUNCTION TESTS
+  printf("LOOKUP FUNCTION TESTS\n");
 
-  name = name_of_friend("h@gmail.com", buckets, NUM_BUCKETS);
-  printf("name for harietta: %s\n", name);
+  printf("bool output expected 1 got:  %d\n",
+         lookup_customer_info("h@gmail.com", buckets, NUM_BUCKETS));
 
-  shoe_size = shoe_size_of_friend("h@gmail.com", buckets, NUM_BUCKETS);
-  printf("shoe_size for hariette: %d\n", shoe_size);
+  printf("bool output expected user doesn't exist and 0 got: %d\n",
+         lookup_customer_info("test", buckets, NUM_BUCKETS));
 
-  fav_food = fav_food_for_friend("s@gmail.com", buckets, NUM_BUCKETS);
-  printf("fav food for sally: %s\n", fav_food);
+  // DELETE TESTS
+  /*
+    printf("delete output expected 1 got: %d\n", delete_friend("h@gmail.com",
+    buckets, NUM_BUCKETS)); printf("lookup after delete expected 0 got: %d\n",
+    lookup_customer_info("h@gmail.com", buckets, NUM_BUCKETS));
+*/
 
-  name = name_of_friend("s@gmail.com", buckets, NUM_BUCKETS);
-  printf("name of sally: %s\n", name);
-
-  fav_food = fav_food_for_friend("h1@gmail.com", buckets, NUM_BUCKETS);
-  printf("fav food for hen1: %s\n", fav_food);
-
-  name = name_of_friend("h1@gmail.com", buckets, NUM_BUCKETS);
-  printf("name of hen1: %s\n", name);
-
+  // LIST CUSTOMER TESTS
+  printf("LIST CUSTOMER TESTS\n");
+  list_customers(buckets, NUM_BUCKETS);
   return 0;
 }
