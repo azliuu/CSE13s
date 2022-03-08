@@ -1,17 +1,17 @@
 # homework 7: Hash tables, I/O and strings
 Design and implement a simple database that will keep track of our customers, and the information about them. With a simple interface, we can read a database file from the disk, add customers, and save the database back to the file.
 
-# Big Picture Program Structure
+## Big Picture Program Structure
 This describes each file and how they relate to one another.
 
-businessdb.c -- contains the main I/O for the project, handling prompting the user for commands. This will include hashtable.h in order to use it's functions.
+businessdb.c -- contains the main I/O for the project, handling prompting the user for commands. This will include hashtable.h in order to use it's functions. It will mainly feed in the user's input into hashtable.h's functions in order to implement the command.
 
 Run the program with
 ```
 make businessdb.c
 ./businessdb
 ```
-hashtable.c -- contains all the logic for hash tables adding users, hashing using their emnail address, as well as containing functions that can be used to get data from an individual customer
+hashtable.c -- contains all the logic for hash tables adding users, hashing using their email address, as well as contains all the functions needed in order to perform the commands specified by the user input.
 
 hashtable.h -- contains the struct for a customer, as well as all the function headers defined in hashtable.c
 
@@ -24,7 +24,7 @@ make format -- correctly formats all files
 make businessdb.c -- compiles businessdb.c and creates an executable named businessdb
 ```
 
-# Storing the information from a customer
+## Storing the information from a customer
 Create a Customer struct that contains an email address (string type), name (string type), shoe size (int type), and favorite food (a string). The following struct will be in a .h file
 ```
 create a struct named Customer that contains
@@ -33,8 +33,8 @@ create a char name var
 create a int shoe_size var
 create a char food var
 ```
-# The main interaction loop I/O
-This is the main interaction loop that forms the interface for users. This will have the ability to read a file from the disk, add customers, delete customers, and save the database back to the file.
+## The main interaction loop I/O
+This is the main interaction loop that forms the interface for users. This will have the ability to read a file from the disk, add customers, delete customers, and save the database back to the file. Below is a close translation of the given python example code. In reality my program plan differs slightly, instead of having all the logic inside this file, the file will handle mainly user input to use functions that are defined in the `hashtable.h` file. There the logic will be implemented for the different hash functions.
 ```
 while True:
     ask the user for a command
@@ -76,7 +76,15 @@ while True:
         else
             print unknown command
 ```
-# Loading customer information from the file
+Quit -- frees all the memory used by the program and then exits
+Save -- writes the current state of the hash table to the file line by line
+Add -- This adds a user to the hashtable. If the key specified by the user already exists, it overwrites the old key with the new specified data given by the user.
+Lookup -- Searches the hashtable and returns the data in the hashtable associated with the given key. If there is no key in the hashtable that matches the specified one, the customer doesn't exist. Print an error message that tells the user the customer doesn't exist.
+Delete -- Iterates through the hashtable, and each linked list element in the hashtable. If the key matches the specified one, free the node and set the next value to the previous value.
+List -- Iteratres through the hastable and executes a lookup for each customer.
+Else -- otherwise the command is not known and print an error message.
+
+## Loading customer information from the file
 This section opens the customers.tsv file, and creates customers with the provided data in the database.
 ```
 set infile tp customers.tsv
@@ -95,7 +103,7 @@ open the infile
 ```
 We can accomplish the split behavior needed using the function `strtok()`.
 
-# storing customer data into a hash table
+## storing customer data into a hash table
 This logic is heavily inspired by the class demo given on Feb 28th. These functions and logic are used in order to store the customer data into buckets in the hash table.
 ```
 create a Customers struct that contains
@@ -149,7 +157,7 @@ char *fav_food_of_customer(char *email, Customers **buckets, size_t num_buckets)
 ```
 This function returns the favorite food of a given customer provided their email. This function can be used in the `lookup` and `list` commands of the main file. The same logic can be used to return any of the customers data: name, email, shoe size, and favorite food.
 
-# saving the customer database file
+## saving the customer database file
 ```
 Open the outfile with write permissions
 dump the current state of the hash table into the file with the same format
