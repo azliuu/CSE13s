@@ -26,34 +26,15 @@ unsigned long hash(char *str) {
   return hash;
 }
 
-// issue: adds a new node even if email is already found.
-FriendNode *add_friend_to_list(char *email, char *name, char *food,
-                               int shoe_size, FriendNode *bucket) {
-
-  // intended logic:
-  // check for if the current bucket already contains a user with that email
-  // if so then override that user's information with the new info
-  // else, create a new node with the new info.
-  FriendNode *node;
-  node = bucket;
-  while (node != NULL) {
-    if (strcmp(node->email, email) != 0) {
-
-      node = malloc(sizeof(FriendNode));
-      node->email = strdup(email);
-      node->name = strdup(name);
-      node->fav_food = strdup(food);
-      node->shoe_size = shoe_size;
-      node->next = bucket;
-      return node;
-    } else {
-    node->name = strdup(name);
-    node->fav_food = strdup(food);
-    node->shoe_size = shoe_size;
-    }
-    node = node->next;
-  }
-  return node;
+FriendNode *add_friend_to_list(char *email, char *name, char *food, int shoe_size, FriendNode *bucket) {
+    FriendNode *new_friend;
+    new_friend = malloc(sizeof(FriendNode));
+    new_friend->email = strdup(email);
+    new_friend->name = strdup(name);
+    new_friend->fav_food = strdup(food);
+    new_friend->shoe_size = shoe_size;
+    new_friend->next = bucket;
+    return new_friend;
 }
 
 void add_friend_to_hashtable(char *email, char *name, char *food, int shoe_size,
@@ -63,6 +44,7 @@ void add_friend_to_hashtable(char *email, char *name, char *food, int shoe_size,
 
   buckets[which_bucket] =
       add_friend_to_list(email, name, food, shoe_size, buckets[which_bucket]);
+
   // debug check for collisions
   printf("customer [%s] goes in bucket [%lu] \n", email, which_bucket);
 }
@@ -83,13 +65,13 @@ bool delete_friend(char *email, FriendNode **buckets, size_t num_buckets) {
             free(temp);
             return true;
         }
-        else {
             node = node->next;
-        }
     }
+    printf("user was not found!\n");
     return false;
 }
 */
+
 bool lookup_customer_info(char *email, FriendNode **buckets,
                           size_t num_buckets) {
   size_t which_bucket = hash(email) % num_buckets;
@@ -124,21 +106,23 @@ bool lookup_customer_info(char *email, FriendNode **buckets,
   return false;
 }
 
+
 void list_customers(FriendNode **buckets, size_t num_buckets) {
   for (int i = 0; i < num_buckets; i++) {
     FriendNode *node;
     node = buckets[i];
-    //if the node isn't null and the node contains just one entry
-    //lookup the customer to print their info
-    if ((node != NULL) && (sizeof(node) == 1)) {
-      lookup_customer_info(node->email, buckets, num_buckets);
-    } else {
-        //otherwise the node contains more than one entry, list until end of Linked List
+    // if the node isn't null and the node contains just one entry
+    // lookup the customer to print their info
+    //if ((node != NULL) && (sizeof(node) == 1)) {
+    //  lookup_customer_info(node->email, buckets, num_buckets);
+    //} else {
+      // otherwise the node contains more than one entry, list until end of
+      // Linked List
       while (node != NULL) {
         lookup_customer_info(node->email, buckets, num_buckets);
         node = node->next;
       }
-    }
+    //}
   }
 }
 
