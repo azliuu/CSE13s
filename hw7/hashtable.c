@@ -44,7 +44,7 @@ void add_friend_to_hashtable(char *email, char *name, char *food, int shoe_size,
   size_t which_bucket = hash(email) % num_buckets;
   FriendNode *node;
   int found = 0;
-  for (int i = 0; i < num_buckets; i++) {
+  for (size_t i = 0; i < num_buckets; i++) {
     node = buckets[i];
     while (node != NULL) {
       if (strcmp(node->email, email) == 0) {
@@ -64,29 +64,58 @@ void add_friend_to_hashtable(char *email, char *name, char *food, int shoe_size,
   // debug check for collisions
   printf("customer [%s] goes in bucket [%lu] \n", email, which_bucket);
 }
-/*
+
 bool delete_friend(char *email, FriendNode **buckets, size_t num_buckets) {
     size_t which_bucket = hash(email) % num_buckets;
     FriendNode *node;
     node = buckets[which_bucket];
 
-    while (node != NULL) {
-        FriendNode *temp = node;
+    //DELETE FIRST CASE (only one node in the linked list)
+    if (node->next == NULL) {
         if (strcmp(node->email, email) == 0) {
-            node = temp->next;
-            free(temp->email);
-            free(temp->name);
-            free(temp->fav_food);
-            free(temp->shoe_size);
-            free(temp);
+            free(node->email);
+            free(node->name);
+            free(node->fav_food);
+            node->shoe_size = 0;
+            free(node);
             return true;
         }
-            node = node->next;
     }
-    printf("user was not found!\n");
+
+    //DELETE SECOND CASE (delete parent from linked list with more than one node).
+    else if (strcmp(node->email, email)  == 0) {
+        buckets[which_bucket] = node->next;
+        free(node->email);
+        free(node->name);
+        free(node->fav_food);
+        node->shoe_size = 0;
+        free(node);
+        return true;
+    }
+    // DELETE THIRD CASE (deleting a node in the middle)
+    else {
+        FriendNode *current = node;
+        FriendNode *prev = NULL;
+        while (strcmp(current->email, email) != 0) {
+            prev = current;
+            //maybe *prev = *current
+            current = current->next;
+        }
+        if (current == NULL) {
+            printf("user not found!\n");
+        } else {
+            prev->next = current->next;
+            free(current->email);
+            free(current->name);
+            free(current->fav_food);
+            current->shoe_size = 0;
+            free(current);
+            return true;
+        }
+    }
     return false;
 }
-*/
+
 
 bool lookup_customer_info(char *email, FriendNode **buckets,
                           size_t num_buckets) {
@@ -123,25 +152,18 @@ bool lookup_customer_info(char *email, FriendNode **buckets,
 }
 
 void list_customers(FriendNode **buckets, size_t num_buckets) {
-  for (int i = 0; i < num_buckets; i++) {
+  for (size_t i = 0; i < num_buckets; i++) {
     FriendNode *node;
     node = buckets[i];
-    // if the node isn't null and the node contains just one entry
-    // lookup the customer to print their info
-    // if ((node != NULL) && (sizeof(node) == 1)) {
-    //  lookup_customer_info(node->email, buckets, num_buckets);
-    //} else {
-    // otherwise the node contains more than one entry, list until end of
-    // Linked List
     while (node != NULL) {
       lookup_customer_info(node->email, buckets, num_buckets);
       node = node->next;
     }
-    //}
   }
 }
 
 // TESTING FOR EACH HASH FUNCTION
+/*
 int main(void) {
 
   unsigned long hashed;
@@ -174,14 +196,16 @@ int main(void) {
          lookup_customer_info("test", buckets, NUM_BUCKETS));
 
   // DELETE TESTS
-  /*
+  printf("DELETE TESTS\n");
     printf("delete output expected 1 got: %d\n", delete_friend("h@gmail.com",
-    buckets, NUM_BUCKETS)); printf("lookup after delete expected 0 got: %d\n",
+    buckets, NUM_BUCKETS));
+    //code breaks here.
+    printf("lookup after delete expected 0 got: %d\n",
     lookup_customer_info("h@gmail.com", buckets, NUM_BUCKETS));
-*/
 
   // LIST CUSTOMER TESTS
   printf("LIST CUSTOMER TESTS\n");
   list_customers(buckets, NUM_BUCKETS);
   return 0;
 }
+ */
